@@ -1,0 +1,210 @@
+\documentclass[
+    11pt,
+    a4paper
+]{article}
+\usepackage[
+    a4paper,
+    left = 10mm,
+    right = 10mm,
+    top = 5mm,
+    bottom = 5mm,
+    bindingoffset = 0cm,
+    columnsep = 1cm
+]{geometry}
+
+\usepackage{hyperref}
+\usepackage{xparse}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage{tkz-graph}
+\usepackage[russian]{babel}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{adjustbox}
+\usetikzlibrary{arrows,%
+                shapes,positioning}
+                
+%\usepackage{nopageno,comment}
+\usepackage{indentfirst}
+\usepackage{cmap}
+\usepackage{ifthen}
+\usepackage{tikz}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\lstset{
+  basicstyle=\ttfamily,
+  mathescape
+}
+
+\newcommand*\justify{%
+  \fontdimen2\font=0.4em% interword space
+  \fontdimen3\font=0.2em% interword stretch
+  \fontdimen4\font=0.1em% interword shrink
+  \fontdimen7\font=0.1em% extra space
+  \hyphenchar\font=`\-% allowing hyphenation
+}
+
+\ExplSyntaxOn
+\DeclareExpandableDocumentCommand{\eval}{m}{\fp_eval:n {#1}}
+\ExplSyntaxOff
+
+\newcommand{\Sum}{\displaystyle\sum\limits}
+\newcommand{\Max}{\max\limits}
+\newcommand{\Min}{\min\limits}
+\newcommand{\fromto}[3]{{#1}=\overline{{#2},\,{#3}}}
+\newcommand{\floor}[1]{\left\lfloor{#1}\right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil{#1}\right\rceil}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\tild}{\widetilde}
+
+\newcommand{\undef}{\otimes}
+\newcommand{\emptys}{\varepsilon}
+\newcommand{\serial}{\texttt{serial}}
+\newcommand{\diff}{\texttt{diff}}
+\newcommand{\sync}{\texttt{sync}}
+\newcommand{\nsync}{\texttt{near\_sync}}
+\newcommand{\remove}{\texttt{remove}}
+\newcommand{\lcp}{\texttt{lcp}}
+\newcommand{\lce}{\texttt{LCE}}
+\newcommand{\lcpinf}{\texttt{lcp}_{\infty}}
+\newcommand{\start}{\texttt{start}}
+\newcommand{\finish}{\texttt{end}}
+\newcommand{\id}{\texttt{id}}
+\newcommand{\slp}{\texttt{SLP}}
+\newcommand{\rlslp}{\texttt{RLSLP}}
+\newcommand{\rlslpq}{\texttt{RLSLP}_q}
+
+\newcommand{\g}{g}
+\newcommand{\grl}{g_{rl}}
+\newcommand{\grlq}{g_{rlq}}
+\newcommand{\zno}{z_{no}}
+\newcommand\growth{{1.1}}
+
+\newcommand{\popcnt}{\texttt{popcnt}}
+\newcommand{\val}{\texttt{val}}
+\newcommand{\lz}{\texttt{LZ}}
+\newcommand{\pr}[2]{#1 \rightarrow #2}
+\newcommand{\tspan}{\texttt{span}}
+\newcommand{\parent}{\texttt{parent}}
+\newcommand{\bin}{\texttt{bin}}
+\newcommand{\hint}{\texttt{hint}}
+\newcommand{\recompression}{\texttt{recomp}}
+\newcommand{\pending}{\texttt{pending}}
+
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\renewcommand{\hat}{\widehat}
+\renewcommand{\emptyset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\ol}{\overline}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Теорема}
+\newtheorem{definition}{Определение}
+\newtheorem{lemma}[theorem]{Лемма}
+\newtheorem{note}[theorem]{Замечание}
+\newtheorem{example}[theorem]{Пример}
+\newtheorem{corollary}[theorem]{Следствие}
+
+\newcommand{\task}[3]{\par\noindent\stepcounter{task}{\bf Задача~\arabic{task}.~\printscore{#1} {#2} } {#3} \vskip 6pt}
+
+\newcommand*{\hm}[1]{#1\nobreak\discretionary{}{\hbox{$#1$}}{}}
+
+\begin{document}
+\centerline{\Large \bf Практика №2 по курсу <<Теория алгоритмов>>}
+\centerline{\Large \bf <<Машина Тьюринга>>}
+\centerline{Группы ФТ-301, ФТ-302}
+
+\section{Распознаватели и работа над ошибками}
+
+На данной практике мы будем рассматривать МТ-распознаватели, то есть МТ с двумя терминальными состояниями $q_{accept}$ и $q_{reject}$. Напомним ещё раз, что такие МТ описываются кортежом $\langle \Gamma, Q, \delta, q_{start}, q_{accept}, q_{reject} \rangle$. 
+
+В конспекте прошлой практики было написано, что \textbf{грубо говоря} можно считать, что МТ распознаватель вычисляет некоторую функцию $f: \Sigma^* \mapsto \{0, 1, \perp\}$, где $\Sigma = \Gamma \setminus \{ \lambda \}$, а $\perp$~--- специальный символ для обозначения зациклившейся или сломаной МТ. Данная интерпретация неверна, так как из неё ускользает аспект неразличимости зависшей МТ от долго работающей МТ. Поэтому корректнее считать, что МТ-распознаватель вычисляет некоторую частичную функцию $f: D \mapsto \{0, 1\}$, где $D \subseteq \Sigma^*$~--- область определения частичной функции $f$. Различие этих определений заключается в том, что в первом случае МТ якобы <<знает>> о своей области определения, а во втором~--- нет.
+
+В качестве небольшого примера для улучшения понимания <<зацикливающихся>> МТ можно рассмотреть следующее плохое определение МТ:
+\begin{definition}
+Пусть на вход МТ подается описание полинома $p$ над множеством целых чисел с переменными $x_1, x_2, \dots, x_k$. МТ работает следующим образом:
+\begin{itemize}
+\item Перебрать все возможные целочисленные комбинации переменных $x_1, x_2, \dots, x_k$;
+\item Вычислить $p$ на каждом из этих наборов параметров;
+\item Если для некоторого работа полином равен $0$, то перейти в состояние $q_{accept}$, иначе~--- в $q_{reject}$.
+\end{itemize}
+\end{definition}
+
+Проблема данного определения МТ состоит в том, что МТ никогда не сможет попасть в состояние $q_{reject}$, так как вычислить значение полинома во всех целочисленных точках невозможно (их бесконечное число).
+
+\section{Разрешимые и перечислимые языки}
+
+Для машины Тьюринга $M$ обозначим за $RCG(M)$ множество строк, на которых МТ заканчивает свою работу в состоянии $q_{accept}$. Будем называть множество (язык) $L$ \textit{перечислимым}, если существует МТ $M$ такая, что $RCG(M) = L$.
+
+Будем называть МТ $M$ решающей, если для любого входа $w \in \Sigma^*$ данная МТ заканчивает свою работу в одном из состояний $q_{accept}$ или $q_{reject}$, то есть не ломается и не зацикливается. В таком случае будем называть множество (язык) $L$ \textit{разрешимым}, если существует решающая МТ $M$ такая, что $RCG(M) = L$.
+
+\begin{example}
+Множество полиномов $L$ с целочисленным корнем, определённое выше, очевидно является перечислимым (в качестве перечисляющей МТ подойдет машина, перебирающая все значения параметров в правильном порядке, например в порядке возрастания суммы $\sum |x_i|$) $$L = \{ \langle p \rangle \mid p - \textit{многочлен с целочисленным корнем над переменным } x_1, x_2, \dots x_k \}$$
+
+Вопрос о разрешимости этого языка не так тривиален и был внесён в список 23 проблем Гильберта под номером 10. Доказательство алгоритмической неразрешимости произвольного диофантова уравнения (то есть неразрешимости языка $L$) была доказана только в 1970 году.
+\end{example}
+
+\begin{example}
+Рассмотрим несколько похожий язык: 
+\begin{align*}
+L_{DFA} = \{ \langle A, B \rangle \mid L(A) = L(B), \textit{ где } &A, B - \textit{конечные автоматы над бинарным алфавитом, а } \\
+&L(D) - \textit{регулярный язык, задающийся автоматом } D 
+\}
+\end{align*}
+
+Легко заметить, что данный язык является перечислимым, так как достаточно просто перебрать все бинарные строки в порядке возрастания длины и синхронно для каждой строки проверять принадлежность каждому из автоматов $A$ и $B$. 
+
+Однако, в отличие от примера с полиномами, данный язык также является разрешимым. Для этого достаточно доказать следующее утверждение:
+\begin{note}
+Обозначим за $n, m$ количество состояний в автоматах $A$ и $B$ соответственно. Тогда, если существует слово $w \in \{0, 1\}^*$ такое, что $w \in L(A), w \notin L(B)$ и $|w| \geq n \times m$, то существует слово $w', |w'| < |w|$ такое, что $w' \in L(A), w' \notin L(B)$.
+\end{note}
+\begin{proof}
+Определим значение функцию $states(w[1..i]) = \langle A(w[1..i]), B(w[1..i]) \rangle$ как кортеж из пары состояний, в которых находятся автоматы $A$ и $B$ после прочтения строки $w[1..i]$. Заметим, что всего различных пар состояний $n \times m$, а для строки $w$ существует $|w| + 1 > n \times m$ значений функции $states$ (учитывая начальное состояние для пустой строки). Значит по принципу Дирихле найдется пара позиций $i \ne j$ таких, что $states(w[1..i]) = states(w[1..j])$, а значит можно рассмотреть строку $w' = w[1..i] + w[j + 1..|w|]$, длина которой строго меньше длины $|w|$ и при этом $states(w') = states(w)$, а значит $w' \in L(A)$ и $w' \notin L(B)$.
+\end{proof}
+Таким образом, если языки различаются, то существует строка $w$ короче $n \times m$ символов, которая входит в один язык и не входит в другой.
+
+Тогда чтобы построить решающую МТ для языка $L_{DFA}$ достаточно перебрать все бинарные строки длиной до $n \times m$ символов.
+\end{example}
+
+На практиках также предлагалось решение, которое минимизирует пару исходных автоматов, а дальше сравнивает графы на изоморфность. Данный подход также верный, однако для доказательства его корректности необходимо показать, что для фиксированного регулярного языка все минимальные ДКА будут изоморфны друг другу. Данный факт следует из теоремы Майхилла-Нероуда (Myhill–Nerode theorem).
+
+
+\section{Неперечеслимые языки}
+
+Мы знаем, что язык $L_{TM} = \{ \langle M, w \rangle \mid M \textit { останавливается на } w\}$ является неразрешимым, но перечислимым языком. Постараемся найти неперечислимый язык, т.е. язык $L$ такой, что не существует МТ $M: RCG(M) = L$. Для этого докажем следующее утверждение:
+\begin{lemma}{(теорема Поста)}
+Язык $L$ является разрешимым тогда и только тогда, когда $L$ и $\overline{L}$~--- перечислимые языки
+\end{lemma}
+\begin{proof}
+Ясно, что из разрешимости $L$ следует перечислимость $L$ и $\overline{L}$.
+
+Доказательство в обратную сторону также достаточно простое~--- так как для $L$ и $\overline{L}$ существуют распознаватели, то достаточно запустить их параллельно, чтобы построить решатель для языка $L$.
+\end{proof}
+
+Таким образом из леммы доказанной выше сразу сделует, что $\overline{L_{TM}}$ является неперечислимым языком.
+
+\section{Операции над разрешимыми и перечислимыми языками}
+
+\begin{lemma}
+Для любого разрешимого языка $L$ верно, что $\overline{L} = U \setminus L$ также является разрешимым языком
+\end{lemma}
+\begin{proof}
+Для $L$ существует решающая МТ $M = \langle \Gamma, Q, \delta, q_{start}, q_{accept}, q_{reject} \rangle$. Несложно показать, что $M' = \langle \Gamma, Q, \delta, q_{start}, q_{reject}, q_{accept} \rangle$ является решающей МТ для языка $\overline{L}$.
+\end{proof}
+
+\textbf{Вопросы на дом}:
+\begin{itemize}
+\item Правда ли, что для любого конечного набора разрешимых языков $L_1, L_2, \dots, L_k$ верно, что $L = \cup_i L_{i}$ также является разрешимым языком?
+\item Правда ли, что разрешимые языки замкнуты относительно операции гомоморфизма $h: \Sigma \mapsto \Delta^*$?
+
+Напомним, что $h(L) = \{ h(w) \mid w \in L \}$, а $h(w_1w_2\ldots w_n) = h(w_1) h(w_2) \cdots h(w_n)$
+\item Правда ли, что для любого перечислимого языка $L$ и некоторого гомоморфизма $h$ верно, что $h(L)$ также является перечислимым?
+\end{itemize}
+
+\end{document}
