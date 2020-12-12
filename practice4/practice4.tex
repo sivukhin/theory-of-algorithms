@@ -1,0 +1,130 @@
+\documentclass[
+    11pt,
+    a4paper
+]{article}
+\usepackage[
+    a4paper,
+    left = 10mm,
+    right = 10mm,
+    top = 5mm,
+    bottom = 5mm,
+    bindingoffset = 0cm,
+    columnsep = 1cm
+]{geometry}
+
+\usepackage{hyperref}
+\usepackage{xparse}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage{tkz-graph}
+\usepackage[russian]{babel}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{adjustbox}
+\usetikzlibrary{arrows,%
+                shapes,positioning}
+                
+%\usepackage{nopageno,comment}
+\usepackage{indentfirst}
+\usepackage{cmap}
+\usepackage{ifthen}
+\usepackage{tikz}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\lstset{
+  basicstyle=\ttfamily,
+  mathescape
+}
+
+\newcommand*\justify{%
+  \fontdimen2\font=0.4em% interword space
+  \fontdimen3\font=0.2em% interword stretch
+  \fontdimen4\font=0.1em% interword shrink
+  \fontdimen7\font=0.1em% extra space
+  \hyphenchar\font=`\-% allowing hyphenation
+}
+
+\ExplSyntaxOn
+\DeclareExpandableDocumentCommand{\eval}{m}{\fp_eval:n {#1}}
+\ExplSyntaxOff
+
+\newcommand{\Sum}{\displaystyle\sum\limits}
+\newcommand{\Max}{\max\limits}
+\newcommand{\Min}{\min\limits}
+\newcommand{\fromto}[3]{{#1}=\overline{{#2},\,{#3}}}
+\newcommand{\floor}[1]{\left\lfloor{#1}\right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil{#1}\right\rceil}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\tild}{\widetilde}
+
+\newcommand{\undef}{\otimes}
+\newcommand{\emptys}{\varepsilon}
+\newcommand{\serial}{\texttt{serial}}
+\newcommand{\diff}{\texttt{diff}}
+\newcommand{\sync}{\texttt{sync}}
+\newcommand{\nsync}{\texttt{near\_sync}}
+\newcommand{\remove}{\texttt{remove}}
+\newcommand{\lcp}{\texttt{lcp}}
+\newcommand{\lce}{\texttt{LCE}}
+\newcommand{\lcpinf}{\texttt{lcp}_{\infty}}
+\newcommand{\start}{\texttt{start}}
+\newcommand{\finish}{\texttt{end}}
+\newcommand{\id}{\texttt{id}}
+\newcommand{\slp}{\texttt{SLP}}
+\newcommand{\rlslp}{\texttt{RLSLP}}
+\newcommand{\rlslpq}{\texttt{RLSLP}_q}
+
+\newcommand{\g}{g}
+\newcommand{\grl}{g_{rl}}
+\newcommand{\grlq}{g_{rlq}}
+\newcommand{\zno}{z_{no}}
+\newcommand\growth{{1.1}}
+
+\newcommand{\popcnt}{\texttt{popcnt}}
+\newcommand{\val}{\texttt{val}}
+\newcommand{\lz}{\texttt{LZ}}
+\newcommand{\pr}[2]{#1 \rightarrow #2}
+\newcommand{\tspan}{\texttt{span}}
+\newcommand{\parent}{\texttt{parent}}
+\newcommand{\bin}{\texttt{bin}}
+\newcommand{\hint}{\texttt{hint}}
+\newcommand{\recompression}{\texttt{recomp}}
+\newcommand{\pending}{\texttt{pending}}
+
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\renewcommand{\hat}{\widehat}
+\renewcommand{\emptyset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\ol}{\overline}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Теорема}
+\newtheorem{definition}{Определение}
+\newtheorem{lemma}[theorem]{Лемма}
+\newtheorem{note}[theorem]{Замечание}
+\newtheorem{example}[theorem]{Пример}
+\newtheorem{corollary}[theorem]{Следствие}
+
+\newcommand{\task}[3]{\par\noindent\stepcounter{task}{\bf Задача~\arabic{task}.~\printscore{#1} {#2} } {#3} \vskip 6pt}
+
+\newcommand*{\hm}[1]{#1\nobreak\discretionary{}{\hbox{$#1$}}{}}
+
+\begin{document}
+\centerline{\Large \bf Практика №4 по курсу <<Теория алгоритмов>>}
+\centerline{\Large \bf <<Альтернативные модели вычислений>>}
+\centerline{Группы ФТ-301, ФТ-302}
+
+Разберём упражнение с одной из первых практик: является ли множество разрешимых языков замкнутым относительно операции гомоморфизма?
+
+
+\section{Алгорифмы (нормальный алгоритм Маркова)}
+
+\section{Грамматики (\textit{не было на практике})}
+
+\end{document}
