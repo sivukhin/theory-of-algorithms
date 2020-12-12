@@ -1,0 +1,209 @@
+\documentclass[
+    11pt,
+    a4paper
+]{article}
+\usepackage[
+    a4paper,
+    left = 10mm,
+    right = 10mm,
+    top = 5mm,
+    bottom = 5mm,
+    bindingoffset = 0cm,
+    columnsep = 1cm
+]{geometry}
+
+\usepackage{hyperref}
+\usepackage{xparse}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage{tkz-graph}
+\usepackage[russian]{babel}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{adjustbox}
+\usetikzlibrary{arrows,%
+                shapes,positioning}
+                
+%\usepackage{nopageno,comment}
+\usepackage{indentfirst}
+\usepackage{cmap}
+\usepackage{ifthen}
+\usepackage{tikz}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\lstset{
+  basicstyle=\ttfamily,
+  mathescape
+}
+
+\newcommand*\justify{%
+  \fontdimen2\font=0.4em% interword space
+  \fontdimen3\font=0.2em% interword stretch
+  \fontdimen4\font=0.1em% interword shrink
+  \fontdimen7\font=0.1em% extra space
+  \hyphenchar\font=`\-% allowing hyphenation
+}
+
+\ExplSyntaxOn
+\DeclareExpandableDocumentCommand{\eval}{m}{\fp_eval:n {#1}}
+\ExplSyntaxOff
+
+\newcommand{\Sum}{\displaystyle\sum\limits}
+\newcommand{\Max}{\max\limits}
+\newcommand{\Min}{\min\limits}
+\newcommand{\fromto}[3]{{#1}=\overline{{#2},\,{#3}}}
+\newcommand{\floor}[1]{\left\lfloor{#1}\right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil{#1}\right\rceil}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\tild}{\widetilde}
+
+\newcommand{\undef}{\otimes}
+\newcommand{\emptys}{\varepsilon}
+\newcommand{\serial}{\texttt{serial}}
+\newcommand{\diff}{\texttt{diff}}
+\newcommand{\sync}{\texttt{sync}}
+\newcommand{\nsync}{\texttt{near\_sync}}
+\newcommand{\remove}{\texttt{remove}}
+\newcommand{\lcp}{\texttt{lcp}}
+\newcommand{\lce}{\texttt{LCE}}
+\newcommand{\lcpinf}{\texttt{lcp}_{\infty}}
+\newcommand{\start}{\texttt{start}}
+\newcommand{\finish}{\texttt{end}}
+\newcommand{\id}{\texttt{id}}
+\newcommand{\slp}{\texttt{SLP}}
+\newcommand{\rlslp}{\texttt{RLSLP}}
+\newcommand{\rlslpq}{\texttt{RLSLP}_q}
+
+\newcommand{\g}{g}
+\newcommand{\grl}{g_{rl}}
+\newcommand{\grlq}{g_{rlq}}
+\newcommand{\zno}{z_{no}}
+\newcommand\growth{{1.1}}
+
+\newcommand{\popcnt}{\texttt{popcnt}}
+\newcommand{\val}{\texttt{val}}
+\newcommand{\lz}{\texttt{LZ}}
+\newcommand{\pr}[2]{#1 \rightarrow #2}
+\newcommand{\tspan}{\texttt{span}}
+\newcommand{\parent}{\texttt{parent}}
+\newcommand{\bin}{\texttt{bin}}
+\newcommand{\hint}{\texttt{hint}}
+\newcommand{\recompression}{\texttt{recomp}}
+\newcommand{\pending}{\texttt{pending}}
+
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\renewcommand{\hat}{\widehat}
+\renewcommand{\emptyset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\ol}{\overline}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Теорема}
+\newtheorem{definition}{Определение}
+\newtheorem{lemma}[theorem]{Лемма}
+\newtheorem{note}[theorem]{Замечание}
+\newtheorem{example}[theorem]{Пример}
+\newtheorem{corollary}[theorem]{Следствие}
+
+\newcommand{\task}[3]{\par\noindent\stepcounter{task}{\bf Задача~\arabic{task}.~\printscore{#1} {#2} } {#3} \vskip 6pt}
+
+\newcommand*{\hm}[1]{#1\nobreak\discretionary{}{\hbox{$#1$}}{}}
+
+\begin{document}
+\centerline{\Large \bf Практика №3 по курсу <<Теория алгоритмов>>}
+\centerline{\Large \bf <<Рекурсивные функции>>}
+\centerline{Группы ФТ-301, ФТ-302}
+
+\section{Примитивно рекурсивные функции}
+
+Определим базовые функции, которые будут лежать в основе нашего класса примитивно рекурсивных функций:
+\begin{itemize}
+\item $\mathbf{0}() = 0$~--- константная 0-арная функция, значение которой равно нулю
+\item $\mathbf{S}: \mathbb{N} \mapsto \mathbb{N}, \mathbf{S}(x) = x + 1$~--- функция инкремента
+\item $\mathbf{\pi_i^n}: \mathbb{N}^n \mapsto \mathbb{N}, \mathbf{\pi_i^n}(x_1, x_2, ..., x_n) = x_i$~--- семейство функций проекции $i$-го аргументра из $n$ 
+\end{itemize}
+
+Определим также правила, позволяющие комбинировать примитивно рекурсивные функции:
+\begin{itemize}
+\item Подстановка~--- если функции $\mathbf{f}: \mathbb{N}^k \mapsto \mathbb{N}$ и $\mathbf{g_1}, \mathbf{g_2}, ..., \mathbf{g_k}: \mathbb{N}^\ell \mapsto \mathbb{N}$ примитивно рекурсивны, то функция $\mathbf{h}: \mathbb{N}^\ell \mapsto \mathbb{N}, \mathbf{h}(x_1, x_2, ..., x_\ell) = \mathbf{f}(\mathbf{g_1}(x_1, x_2, ..., x_\ell), ..., \mathbf{g_k}(x_1, x_2, ..., x_\ell))$ также является примитивно рекурсивной
+
+\item Примитивная рекурсия~--- если функции $\mathbf{f}: \mathbb{N}^k \mapsto \mathbb{N}$ и $\mathbf{g}: \mathbb{N}^{k+2} \mapsto \mathbb{N}$ примитивно рекурсивны, то функция $\mathbf{h}: \mathbb{N}^{k+1} \mapsto \mathbb{N}, \mathbf{h}(x_1, x_2, ..., x_k, y) = \begin{cases}
+\mathbf{f}(x_1, x_2, ..., x_k)&, \text{ если } y = 0\\
+\mathbf{g}(x_1, x_2, ..., x_k, y - 1, h(x_1, x_2, ..., x_k, y - 1))&, \text{ иначе }
+\end{cases}$
+\end{itemize}
+
+В результате класс примитивно рекурсивных функций $\mathit{PR}$ можно определить как минимальный по включению класс функций натуральных аргументов такой, что $\{\mathbf{0}, \mathbf{S}\} \cup \{\mathbf{\pi_i^n}\}_{n \in \mathbb{N} \wedge 1 \leq i \leq n} \in \mathit{PR}$ и $\mathit{PR}$ замкнут относительно операций подстановки и примитивной рекурсии.
+
+\subsection{Пример. Факториал}
+Для примера построим из базовых функций с помощью правил подстановки и примитивной рекурсии функцию, вычисляющую факториал числа $n$. Для этого вспомним рекурсивное определение факториала:
+$$\mathbf{fact}(n) = \begin{cases} n \cdot \mathbf{fact}(n - 1) &, \text{ если } n > 0\\ 1&, \text{ иначе }\end{cases}$$
+
+Правило примитивной рекурсии по сути представляет из себя обыкновенную математическую индукцию (база определяется функцией $\mathbf{f}$, а шаг~--- $\mathbf{g}$).Попробуем описать рекурсивный переход для факториала с помощью примитивной рекурсии. Для этого необходимо определить $\mathbf{f}$ как $\mathbf{f}() = \mathbf{S}(\mathbf{0}) = 1$ (здесь мы воспользовались базовыми функциями $\mathbf{S}$ и $\mathbf{0}$, а также правилом композции функций), а $\mathbf{g}(\cdot, \cdot)$ определить как $\mathbf{g}(y, z) = prod(\mathbf{S}(\mathbf{\pi_1^2}(y, z)), \mathbf{\pi_2^2}(y, z)) = (y + 1) \cdot z$ (здесь мы также воспользовались композицией и неявно построили дополнительную примитивно рекурсивную функцию $\mathbf{t}(y, z) = \mathbf{S}(\mathbf{\pi_1^2}(y, z))$). В таком случае $\mathbf{h}$, построенная с помощью правила примитивной рекурсии из функций $\mathbf{f}$ и $\mathbf{g}$ будет вычислять значение $\mathbf{fact}(n)$. 
+
+В этом примере мы пользовались тем, что $prod(x) \in \mathit{PR}$, однако можно легко доказать примитивную рекурсивность произведения аналогичным образом (для этого потребуется также доказать примитивную рекурсивность сложения).
+
+\subsection{Упражнение. Целочисленное деление}
+
+Будем считать доказанными факты, что остаток отделения на число, условный оператор, операторы сравнения являются примитивно рекурсивными функциями.
+ 
+Теперь докажем примитивную рекурсивность функции $\mathbf{div_d}(n) = \lfloor \frac{n}{d} \rfloor$. Для этого рассмотрим два подхода:
+\begin{enumerate}
+\item Заметим, что $\mathbf{div_d}(n) = \mathbf{div_d}(n - 1) + [n \equiv_d 0]$. Данное соотношение хорошо ложиться на паттерн примитивной рекурсии и можно легко построить функцию $\mathbf{h}(n) = \mathbf{div_d}(n)$, используя $\mathbf{f}() = \mathbf{0}$ и $\mathbf{g}(y, z) = z + [\mathbf{rem}(y + 1, d) = 0]$
+\item Для второго подхода воспользуемся следующим определением: $\mathbf{div_d}(n) = \max \{ k \mid k \cdot d \leq n \wedge k \in \mathbb{Z^+} \}$. Определим следующую функцию: $\mathbf{m}(n, d, b) = \max \{ k \mid k \cdot d \leq n \wedge 0 \leq k \leq b \}$. Легко заметить, что $\mathbf{m}(n, d, b) = \begin{cases}
+\mathbf{0} &, \text{ если } b = 0\\
+\mathbf{m}(n, d, b - 1) &, \text{ если } b \cdot d > n\\
+\mathbf{b} &, \text{ иначе} 
+\end{cases}$
+Несложно доказать примитивно рекурсивность функции $\mathbf{m}$, а дальше остается воспользоваться соотношением $\mathbf{div_d}(n) = \mathbf{m}(n, d, n)$.
+
+Данный пример интересен тем, что в нём неявно используется оператор ограниченной минимизации. Определим оператор $\mu_{\leq b(x)}$, после применения которого к предикату $\mathbf{p}: \mathbb{N}^{k+1} \mapsto \{0, 1\}$ получается функция $\mathbf{f}: \mathbb{N}^k \mapsto \mathbb{N}$ следующим образом: $\mathbf{f}(x) = \min\{y \leq b(x) \mid \mathbf{p}(x, y)\}$, где $b(x)$~--- некоторая примитивно рекурсивная функция (будем считать, что $\mathbf{f}(x) = b(x) + 1$, если $\{y \leq b(x) \mid \mathbf{p}(x, y)\} = \emptyset$).
+
+Таким образом нетрудно представить функцию $\mathbf{div_d}(n)$ как результат применения оператора минимизации к предикату $\mathbf{p_d}(n, k) = [k \cdot d > n]$, а именно $\mathbf{div_d}(n) = (\mu_{\leq n} \mathbf{p_d})(n) - 1$. Ход доказательства примитивной рекурсивности ограниченного оператора минимизации в точности повторяет процесс построения функции $\mathbf{m}(n, d, b)$.
+\end{enumerate}
+
+\section{Примитивно рекурсивная нумерация пар}
+
+Рекурсивные функции оперируют только числами, поэтому необходимо придумать способ работы с кортежами чисел в рамках заданных правил. Для начала поймем, как можно построить примитивно рекурсивные функции $\mathbf{enc}(x_1, x_2, ..., x_n)$ и $\mathbf{dec}(code, i)$ для шифрования и расшифровки конкретного элемента кортежа.  Данные функции должны удовлетворять следующему соотношение: $\mathbf{dec}(\mathbf{enc}(x_1, x_2, ..., x_i, ..., x_n), i) = x_i$.
+
+Для построения этих функций воспользуемся основной теоремой арифметики: каждое натуральное число имеет единственное разложение на простые множители $n = a_1^{d_1} \cdot a_2^{d_2} \cdots a_k^{d_k}$, где $a_1 < a_2 < ... < a_k$~--- простые числа. Таким образом, если занумеровать простые числа по порядку ($p_1 = 2, p_2 = 3, p_3 = 5, ...$), то числу $n = p_{i_1}^{d_1} \cdot p_{i_2}^{d_2} \cdots p_{i_k}^{d_k}$ соответствует кортеж длины $i_k$, где на позициях $i_1, i_2, ..., i_k$ стоят числа $d_1, d_2, ..., d_k$, а на все остальных~--- нули. 
+
+Таким образом функция $\mathbf{enc}(x_1, x_2, ..., x_n) = p_1^{x_1} \cdot p_2^{x_2} \cdots p_n^{x_n}$ и для доказательства её примитивной рекурсивности достаточно понять, что нахождение $i$-го простого числа - примитивно рекурсивная функция (ясно, что функция проверки на простоту~--- примитивно-рекурсивная, а значит $\mathbf{nth\_prime}(x) = (\mu_{\leq nth\_prime(x-1)} \mathbf{is\_prime}(\mathbf{nth\_prime}(x - 1) + y + 1))(x)$, что является корректным определением из-за постулата Бертрана).
+
+Для функции $\mathbf{dec}(code, i)$ также необходимо воспользоваться функцией $\mathbf{nth\_prime}$, после чего найти степень вхождения этого простого числа в $code$.
+
+\subsection{Упражнение. Совместная рекурсия}
+
+Пусть функции $\mathbf{f}$ и $\mathbf{g}$ определены следующим образом:
+$$\begin{cases}
+\mathbf{f}(0) = A\\
+\mathbf{g}(0) = B\\
+\mathbf{f}(y) = \mathbf{F}(\mathbf{f}(y - 1), \mathbf{g}(y - 1), y - 1)\\
+\mathbf{g}(y) = \mathbf{G}(\mathbf{f}(y - 1), \mathbf{g}(y - 1), y - 1)\\
+\end{cases}$$
+где $\mathbf{F}, \mathbf{G}$~--- примитивно рекурсивные функции. 
+
+Докажем, что $\mathbf{f}, \mathbf{g}$ также являются примитивно рекурсивными функциями. Для этого рассмотрим функцию $\mathbf{h}(y) = \mathbf{enc}(\mathbf{f}(y), \mathbf{g}(y))$. Ясно, что $\mathbf{f}(y) = \mathbf{dec_1}(\mathbf{h}(y))$ и $\mathbf{g}(y) = \mathbf{dec_2}(\mathbf{h}(y))$. Докажем тогда примитивную рекурсивность функции $\mathbf{h}$. Заметим, что $$\mathbf{h}(y) = \mathbf{enc}(\mathbf{F}(\mathbf{dec_1}(\mathbf{h}(y - 1)), \mathbf{dec_2}(\mathbf{h}(y - 1)), y - 1), \mathbf{G}(\mathbf{dec_1}(\mathbf{h}(y - 1)), \mathbf{dec_2}(\mathbf{h}(y - 1)), y - 1))$$
+откуда следует примитивная рекурсивность функции $\mathbf{h}$.
+
+\section{Рекурсивные функции}
+
+Определение рекурсивных функций отличается от определения примитивно рекурсивных функций только тем, что к двум правилам композиции и примитивной рекурсии добавляется третее правило \textbf{неограниченной} минимизации:
+\begin{itemize}
+\item Оператор \textbf{неограниченной} минимизации $\mathbf{\mu}$ применяется к $k{+}1$-арному предикату $\mathbf{p}: \mathbb{N}^{k+1} \mapsto \{0, 1\}$, в результате чего получается частичная $k$-арная функция $\mathbf{g}(x_1, x_2, ..., x_k) = \min \{ y \mid \mathbf{p}(x_1, x_2, ..., x_n, y) = 0 \}$. Важно понимать, что в отличие от правил композиции и примитивной рекурсии, применение оператора неограниченной минимизации может превратить полную функцию в частичную (то есть функцию, определённую на некотором множестве $D \subset \mathbb{N}^k$).
+\end{itemize}
+
+\subsection{Функция Аккермана}
+
+Ясно, что так как множество рекурсивных функций $\mathit{R}$ содержит частичные функции, то любая частичная функция $\mathbf{f} \in \mathit{R}$ не содержится во множестве $\mathit{PR}$. Остается понять, существуют ли полные рекурсивные функции, не принадлежащие множеству $\mathit{PR}$. Одним из примеров таких функций является функция Аккермана:
+$$\mathbf{A}(m, n) = \begin{cases}n + 1 &, m = 0\\\mathbf{A}(m - 1, 1) &, m > 0, n = 0\\\mathbf{A}(m - 1, \mathbf{A}(m, n - 1)) &, m > 0, n > 0\end{cases}$$
+
+Таким образом $\mathbf{A} \in \mathit{R} \setminus \mathit{PR} \neq \emptyset$.
+
+\end{document}
