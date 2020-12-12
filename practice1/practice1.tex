@@ -1,0 +1,306 @@
+\documentclass[
+    11pt,
+    a4paper
+]{article}
+\usepackage[
+    a4paper,
+    left = 10mm,
+    right = 10mm,
+    top = 5mm,
+    bottom = 5mm,
+    bindingoffset = 0cm,
+    columnsep = 1cm
+]{geometry}
+
+\usepackage{hyperref}
+\usepackage{xparse}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+%\usepackage{nopageno,comment}
+\usepackage{indentfirst}
+\usepackage{cmap}
+\usepackage{ifthen}
+\usepackage{tikz}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\lstset{
+  basicstyle=\ttfamily,
+  mathescape
+}
+
+\newcommand*\justify{%
+  \fontdimen2\font=0.4em% interword space
+  \fontdimen3\font=0.2em% interword stretch
+  \fontdimen4\font=0.1em% interword shrink
+  \fontdimen7\font=0.1em% extra space
+  \hyphenchar\font=`\-% allowing hyphenation
+}
+
+\ExplSyntaxOn
+\DeclareExpandableDocumentCommand{\eval}{m}{\fp_eval:n {#1}}
+\ExplSyntaxOff
+
+\newcommand{\Sum}{\displaystyle\sum\limits}
+\newcommand{\Max}{\max\limits}
+\newcommand{\Min}{\min\limits}
+\newcommand{\fromto}[3]{{#1}=\overline{{#2},\,{#3}}}
+\newcommand{\floor}[1]{\left\lfloor{#1}\right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil{#1}\right\rceil}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\tild}{\widetilde}
+
+\newcommand{\undef}{\otimes}
+\newcommand{\emptys}{\varepsilon}
+\newcommand{\serial}{\texttt{serial}}
+\newcommand{\diff}{\texttt{diff}}
+\newcommand{\sync}{\texttt{sync}}
+\newcommand{\nsync}{\texttt{near\_sync}}
+\newcommand{\remove}{\texttt{remove}}
+\newcommand{\lcp}{\texttt{lcp}}
+\newcommand{\lce}{\texttt{LCE}}
+\newcommand{\lcpinf}{\texttt{lcp}_{\infty}}
+\newcommand{\start}{\texttt{start}}
+\newcommand{\finish}{\texttt{end}}
+\newcommand{\id}{\texttt{id}}
+\newcommand{\slp}{\texttt{SLP}}
+\newcommand{\rlslp}{\texttt{RLSLP}}
+\newcommand{\rlslpq}{\texttt{RLSLP}_q}
+
+\newcommand{\g}{g}
+\newcommand{\grl}{g_{rl}}
+\newcommand{\grlq}{g_{rlq}}
+\newcommand{\zno}{z_{no}}
+\newcommand\growth{{1.1}}
+
+\newcommand{\popcnt}{\texttt{popcnt}}
+\newcommand{\val}{\texttt{val}}
+\newcommand{\lz}{\texttt{LZ}}
+\newcommand{\pr}[2]{#1 \rightarrow #2}
+\newcommand{\tspan}{\texttt{span}}
+\newcommand{\parent}{\texttt{parent}}
+\newcommand{\bin}{\texttt{bin}}
+\newcommand{\hint}{\texttt{hint}}
+\newcommand{\recompression}{\texttt{recomp}}
+\newcommand{\pending}{\texttt{pending}}
+
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\renewcommand{\hat}{\widehat}
+\renewcommand{\emptyset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\ol}{\overline}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Теорема}
+\newtheorem{definition}{Определение}
+\newtheorem{lemma}[theorem]{Лемма}
+\newtheorem{note}[theorem]{Замечание}
+\newtheorem{corollary}[theorem]{Следствие}
+
+\newcommand{\task}[3]{\par\noindent\stepcounter{task}{\bf Задача~\arabic{task}.~\printscore{#1} {#2} } {#3} \vskip 6pt}
+
+\newcommand*{\hm}[1]{#1\nobreak\discretionary{}{\hbox{$#1$}}{}}
+
+\begin{document}
+\centerline{\Large \bf Практика №1 по курсу <<Теория алгоритмов>>}
+\centerline{\Large \bf <<Машина Тьюринга>>}
+\centerline{Группы ФТ-301, ФТ-302}
+
+\section{Определения}
+Неформально машина Тьюринга (МТ) состоит из трёх основных компонентов: 
+\begin{itemize}
+\item Бесконечная лента, на которой записываются входные данные, результат работы машины и все промежуточные вычисления;
+\item Каретка~--- устройство, указывающее на одну конкретную ячейку бесконечной ленты и позволяющее считывать и записывать данные из этой ячейки;
+\item Состояние машины Тьюринга~--- определяет текущее поведение и реакцию машины Тьюринга на каждый символ, который она встретит на ленте.
+\end{itemize}
+
+Формально можно определить МТ как кортеж из пяти элементов $M = \langle \Gamma, Q, \delta, q_{start}, q_{finish} \rangle$, где каждый из компонентов имеет следующее значение:
+\begin{itemize}
+\item $\Gamma$~--- множество символов, которые могут быть записаны в ячейках ленты МТ, среди которых всегда есть символ пустой ячейки $\lambda \in \Gamma$;
+\item $Q$~--- конечное множество состояний машины Тьюринга;
+\item $\delta: (\Gamma \times Q) \mapsto (\Gamma \times Q \times \{\leftarrow, \uparrow, \rightarrow\})$~--- функция перехода, которая по заданной паре (символ на ленте, состояние машины) определяет тройку: (символ, который необходимо записать в текущую ячейку, новое состояние МТ, сдвиг карертки МТ);
+\item $q_{start}, q_{finish}$~--- начальное и конечное состояния МТ.
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.75\textwidth]{mt_1}
+
+\vspace{0.5cm}
+
+\includegraphics[width=0.75\textwidth]{mt_2}
+
+\vspace{0.5cm}
+
+\includegraphics[width=0.75\textwidth]{mt_3}
+
+\vspace{0.5cm}
+
+\includegraphics[width=0.75\textwidth]{mt_4}
+\caption{Пример одной итерации работы МТ, где $\Gamma = \{0, 1, \lambda\}$ и $\delta(1 , q_0) = (0, q_1, \rightarrow)$}
+\end{figure}
+
+Можно считать, что в начальный момент времени каретка МТ находится в ячейке первого символа входных данных, а после работы МТ каретка должна указывать на первую ячейку, откуда слева направо можно прочитать выходные данные. Дополнительно можно принять соглашение о том, что слева от конечного положения каретки МТ должны быть только пустые символы.
+
+\section{Задача <<Чётность числа единиц в строке>>}
+
+Для примера построим МТ, которая в строке из нулей и единиц будет вычислять значения количества единиц по модулю 2. 
+
+Принцип работы МТ для этой задачи простой~--- необходимо считать строку слева направо, поддерживая при этоя чётность количества единиц для каждого префикса. Для поддержания этого значения можно завести пару отдельных состояний $\texttt{even}$ и $\texttt{odd}$.
+
+Таким образом легко определить следующие компоненты МТ: 
+\begin{itemize}
+\item $\Gamma = \{0, 1, \lambda\}$;
+\item $Q = \{\texttt{even}, \texttt{odd}, \texttt{finish}\}$;
+\item $q_{start} = \texttt{even}, q_{finish} = \texttt{finish}$.
+\end{itemize}
+
+Функция перехода действует тоже достаточно просто~--- при обнаружении символа 0 под кареткой, состояние не меняется, а при обнаружении символа 1~--- состояние инвертируется и каретка в любом случае двигается вправо. Полное множество переходов можно записать в виде таблицы следующим образом:
+
+\begin{center}
+\begin{tabular}{ | c | c | c | c |}
+\hline
+состояние \textbackslash{ }символ & 0 & 1 & $\lambda$ \\ 
+ \hline
+ \texttt{even} & $\lambda \rightarrow$ & $\lambda \rightarrow \texttt{odd}$ & 0 \texttt{finish}\\  
+ \hline
+ \texttt{odd} & $\lambda \rightarrow$ & $\lambda \rightarrow \texttt{even}$ & 1 \texttt{finish}\\
+ \hline
+\end{tabular}
+\end{center}
+
+Для описания перехода для конкретной пары $(c, q) \in \Gamma \times Q$ в таблице используется порядок (символ, направление, новое состояние), где каждую из компонент можно опустить, в результате чего будет использовано поведение по умолчанию (по умолчанию МТ не меняет символ, который написан в текущей ячейке, стоит на месте и остается в текущем состоянии).
+
+\textbf{Упражнение:} Задача B из контеста про машины Тьюринга. Чтобы получить доступ к контесту отправь свой \texttt{JudgeID} на сайте \texttt{acm.timus.ru} в письме с темой <<\texttt{Теория алгоритмов. Контест. \%ФИО\%. \%Группа\%}>> на почту \texttt{sivukhin.nikita@yandex.ru}. Чтобы сдать задачу в этом контесте необходимо описать МТ в следующем формате:
+\begin{verbatim}
+[количество состояний, |Q|]
+[идентификаторы состояний МТ]...
+[количество определённых значений функции перехода]
+[состояние] [символ] -> [новое состояние] [новый символ] [направление|L, S, R]...
+\end{verbatim}
+
+\section{Распознаватель}
+
+Грубо говоря можно считать, что МТ построенная по определению из предыдущего раздела, задаёт функцию $f: \Sigma^* \mapsto \Sigma^* \cup \{ \perp \}$, где $\Sigma = \Gamma \setminus \{ \lambda \}$, а $\perp$~--- специальный символ, который обозначает, что машина Тьюринга зациклилась или сломалась на заданном входе (мы будем стараться строить МТ, которые не ломаются и не зацикливаются, но формально никто не запрещает подобрать такую функцию перехода, которая будет зацикливаться или ломаться на некоторых входных данных). 
+
+Иногда имеет ограничить выходные значения МТ, для упрощения её построения и анализа. Для этого модифицируем формальное определение МТ, заменив одного терминальное состояние $q_{finish}$ на пару терминальных состояний: $q_{accept}$ и $q_{reject}$. В случае завершения своей работы в состоянии $q_{accept}$ МТ <<принимает>> исходную входную строку, а в случае завершения работы в $q_{reject}$~--- отвергает. Такая модификация определяет МТ-распознаватель, который задаёт функцию $f: \Sigma^* \mapsto \{0, 1, \perp\}$.
+
+\section{Задача <<Копия исходной строки>>}
+
+\textbf{Задача:} Построим МТ, которая по входной строке $s \in \{0, 1\}^*$ построит на ленте строку $s\#s$.
+
+Процесс работы МТ достаточно прост: машина сначала должна поставить решётку после конца исходной строки, после чего начать копировать символы слева направо. Значение очередного символа для копирования сохраняется в состоянии, а чтобы МТ смогла вернуться к следующему символу можно временно стереть символ в исходной строке, который в данный момент копируется. Формально, МТ будет выглядеть следующим образом:
+
+\begin{itemize}
+\item $\Gamma = \{0, 1, \lambda\}$;
+\item $Q = \{\texttt{sharp}, \texttt{unk}, \texttt{set}, \texttt{left\_0}, \texttt{left\_1}, \texttt{right\_0}, \texttt{right\_1}, \texttt{finish}\}$;
+\item $q_{start} = \texttt{sharp}, q_{finish} = \texttt{finish}$.
+\end{itemize}
+
+\begin{center}
+\begin{table}[H]
+\centering
+\begin{tabular}{ | c | c | c | c | c | }
+\hline
+состояние \textbackslash{ }символ & 0 & 1 & \# & $\lambda$ \\ 
+ \hline
+ \texttt{sharp} & $\rightarrow$ & $\rightarrow$ & X & \# $\leftarrow$ \texttt{unk} \\  
+ \hline
+ \texttt{unk} & $\leftarrow$ & $\leftarrow$ & X & $\rightarrow \texttt{set}$\\
+ \hline
+ \texttt{set} & $\lambda \rightarrow \texttt{right\_0}$ & $\lambda \rightarrow \texttt{right\_1}$ & \texttt{finish} & X\\
+ \hline
+ \texttt{right\_0} & $\rightarrow$ & $\rightarrow$ & $\rightarrow$ & $0 \leftarrow \texttt{left\_0}$\\
+ \hline
+ \texttt{right\_1} & $\rightarrow$ & $\rightarrow$ & $\rightarrow$ & $1 \leftarrow \texttt{left\_1}$\\
+ \hline
+ \texttt{left\_0} & $\leftarrow$ & $\leftarrow$ & $\leftarrow$ & $0 \rightarrow \texttt{set}$\\
+ \hline
+ \texttt{left\_1} & $\leftarrow$ & $\leftarrow$ & $\leftarrow$ & $1 \rightarrow \texttt{set}$\\
+ \hline
+\end{tabular}
+\caption{недостижимые состояния МТ обозначаются крестиком(X) в таблице переходов}
+\end{table}
+\end{center}
+
+Заметим, что функция перехода $\delta$ упрощена, так как в конце своей работы каретка МТ находится в ячейке с символом \#. Чтобы передвинуть МТ к началу выходных данных понадобятся ещё состояния.
+
+\textbf{Упражнение на дом:} решить задачу дублирования без символа \#. Задача C из контеста про машины Тьюринга
+
+
+\section{Задача <<Проверить строку на палиндромность>>}
+
+\textit{Палиндром, \textbf{перевертень}~--- число, буквосочетание, слово или текст, одинаково читающееся в обоих направлениях}
+
+\textbf{Задача:} Построить распознаватель, который определит~--- является ли записанная на ленте строка $s \in \{0, 1\}^*$ палиндромом или нет?
+
+Для решения задачи достаточно построить МТ, которая будет сравнивать между собой символы с обоих концов строки. Для удобства лучше стирать символы, которые были уже сравнены, чтобы уменьшить размер описания МТ.
+
+\textbf{Упражнение на дом:} написать таблицу переходов для решения этой задачи. Задача D из контеста про машины Тьюринга.
+
+\section{Задача <<A + B>>}
+
+\textbf{Задача:} Построить машину Тьюринга, которая для пары двоичных чисел, записанных через знак \texttt{+} вычислит их сумму и запишет на ленту в двоичной системе счисления.
+
+Для решения этой задачи полезно расширить множество допустимых символов, добавив туда помеченные символы для двоичных цифр: $\Gamma = \{0, 1, 0', 1', \lambda, +\}$. С помощью данных меток МТ может <<запоминать>> позицию разряда в одном числе, пока происходит процесс обработки второго числа.
+
+\textbf{Упражнение на дом:} написать таблицу переходов для решения этой задачи. Задача E из контеста про машины Тьюринга.
+
+\section{Поиграем со множеством перемещений МТ}
+
+Рассмотрим три модификации МТ, которые будут отличаться только определением функции перехода:
+\begin{itemize}
+\item $MT_1$: машины Тьюринга такие, что $\delta: \Gamma \times Q \mapsto \Gamma \times Q \times \{\leftarrow, \uparrow, \rightarrow\}$
+\item $MT_2$: машины Тьюринга такие, что $\delta: \Gamma \times Q \mapsto \Gamma \times Q \times \{\leftarrow, \rightarrow\}$
+\item $MT_3$: машины Тьюринга такие, что $\delta: \Gamma \times Q \mapsto \Gamma \times Q \times \{\uparrow, \rightarrow\}$
+\end{itemize}
+
+Понятно, что класс функций, которые можно вычислить с помощью $MT_1$, не меньше, чем классы функций, которые можно вычислить с помощью $MT_2$ и $MT_3$. Постараемся ответить на такой вопрос: существует ли функция $f$, которую можно вычислить с помощью некоторой МТ из класса $MT_1$, но нельзя вычислить с помощью МТ из класса $MT_2$. Легко заметить, что такой функции не существует, потому что любую МТ $T \in MT_1$ можно легко преобразовать в $T'$ таким образом, чтобы функция переходов всегда передвигала каретку либо вправо либо влево, а значит $T' \in MT_2$. Идея преобразования достаточно простая~--- для каждого перехода с неподвижной кареткой необходимо сделать два последовательных перехода, где каретка двигалась бы в две противоположные стороны. Формально, данное преобразование можно описать следующим образом:
+\begin{itemize}
+\item $T = \langle \Gamma, Q, \delta, q_{start}, q_{finish} \rangle$
+\item $T' = \langle \Gamma, Q', \delta', q_{start}, q_{finish} \rangle$
+\item $Q' = Q \cup \{ q' \mid q \in Q \}$
+\item \begin{align*}\delta' = &\{ (c_1, q_1) \rightarrow (c_2, q_2, d) \mid (c_1, q_1) \rightarrow (c_2, q_2, d) \in \delta \wedge d \in \{ \leftarrow, \rightarrow \} \} \cup\\
+& \{ (c_1, q_1) \rightarrow (c_2, q_2', \leftarrow) \mid (c_1, q_1) \rightarrow (c_2, q_2, \uparrow) \in \delta \} \cup \\
+& \{ (c_1, q') \rightarrow (c_1, q, \rightarrow) \mid q \in Q \}
+\end{align*}
+\end{itemize}
+
+Таким образом классы машин Тьюринга $MT_1$ и $MT_2$ эквиваленты с точки зрения функций, которые они могут вычислить.
+
+Несложно также понять, что класс $MT_3$ неэквивалентен классам $MT_1$ и $MT_2$. Если внимательно присмотреться, то МТ из $MT_3$ представляют из себя конечные автоматы и для доказательства неэквивалентности классов достаточно привести пример нерегулярного языка, который можно распознать с помощью обычной МТ (например язык палиндромных строк).
+
+\section{Упражнения на дом по желанию}
+
+\begin{itemize}
+\item Написать МТ, распознающую степени двойки, записанные в унарной системе счисления (задача F из контеста про машины Тьюринга)
+\item Написать МТ, подсчитывающую количество вхождений подстроки в строку и выводяющую данное число в двоичной системе счисления (задача G из контеста про машины Тьюринга)
+\end{itemize}
+
+Писать таблицы переходов может быть утомительно, поэтому можно попробовать упростить себе задачу, написав несложный транслятор из примитивного языка программирования в формальное определение МТ. Пример синтаксиса, который можно было бы поддержать (за основу взять \texttt{javascript}):
+
+\begin{verbatim}
+export const Gamma = ['0', '1', '_'];
+let sum = '0';
+while (head != '_') {
+    let current = sum;
+    if (head == '1' && current == '0') {
+        sum = '1';
+    }
+    if (head == '1' && current == '1') {
+        sum = '0';
+    }
+    write('_');
+    move_right();
+}
+write(sum);
+
+\end{verbatim}
+
+
+\end{document}
