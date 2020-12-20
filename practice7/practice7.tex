@@ -1,0 +1,175 @@
+\documentclass[
+    11pt,
+    a4paper
+]{article}
+\usepackage[
+    a4paper,
+    left = 10mm,
+    right = 10mm,
+    top = 5mm,
+    bottom = 5mm,
+    bindingoffset = 0cm,
+    columnsep = 1cm
+]{geometry}
+
+\usepackage{hyperref}
+\usepackage{xparse}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage{tkz-graph}
+\usepackage[russian]{babel}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{adjustbox}
+\usetikzlibrary{arrows,%
+                shapes,positioning}
+                
+%\usepackage{nopageno,comment}
+\usepackage{indentfirst}
+\usepackage{cmap}
+\usepackage{ifthen}
+\usepackage{tikz}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\lstset{
+  basicstyle=\ttfamily,
+  mathescape
+}
+
+\newcommand*\justify{%
+  \fontdimen2\font=0.4em% interword space
+  \fontdimen3\font=0.2em% interword stretch
+  \fontdimen4\font=0.1em% interword shrink
+  \fontdimen7\font=0.1em% extra space
+  \hyphenchar\font=`\-% allowing hyphenation
+}
+
+\ExplSyntaxOn
+\DeclareExpandableDocumentCommand{\eval}{m}{\fp_eval:n {#1}}
+\ExplSyntaxOff
+
+\newcommand{\Sum}{\displaystyle\sum\limits}
+\newcommand{\Max}{\max\limits}
+\newcommand{\Min}{\min\limits}
+\newcommand{\fromto}[3]{{#1}=\overline{{#2},\,{#3}}}
+\newcommand{\floor}[1]{\left\lfloor{#1}\right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil{#1}\right\rceil}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\tild}{\widetilde}
+
+\newcommand{\undef}{\otimes}
+\newcommand{\emptys}{\varepsilon}
+\newcommand{\serial}{\texttt{serial}}
+\newcommand{\diff}{\texttt{diff}}
+\newcommand{\sync}{\texttt{sync}}
+\newcommand{\nsync}{\texttt{near\_sync}}
+\newcommand{\remove}{\texttt{remove}}
+\newcommand{\lcp}{\texttt{lcp}}
+\newcommand{\lce}{\texttt{LCE}}
+\newcommand{\lcpinf}{\texttt{lcp}_{\infty}}
+\newcommand{\start}{\texttt{start}}
+\newcommand{\finish}{\texttt{end}}
+\newcommand{\id}{\texttt{id}}
+\newcommand{\slp}{\texttt{SLP}}
+\newcommand{\rlslp}{\texttt{RLSLP}}
+\newcommand{\rlslpq}{\texttt{RLSLP}_q}
+
+\newcommand{\g}{g}
+\newcommand{\grl}{g_{rl}}
+\newcommand{\grlq}{g_{rlq}}
+\newcommand{\zno}{z_{no}}
+\newcommand\growth{{1.1}}
+
+\newcommand{\popcnt}{\texttt{popcnt}}
+\newcommand{\val}{\texttt{val}}
+\newcommand{\lz}{\texttt{LZ}}
+\newcommand{\pr}[2]{#1 \rightarrow #2}
+\newcommand{\tspan}{\texttt{span}}
+\newcommand{\parent}{\texttt{parent}}
+\newcommand{\bin}{\texttt{bin}}
+\newcommand{\hint}{\texttt{hint}}
+\newcommand{\recompression}{\texttt{recomp}}
+\newcommand{\pending}{\texttt{pending}}
+
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\renewcommand{\hat}{\widehat}
+\renewcommand{\emptyset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\ol}{\overline}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Теорема}
+\newtheorem{definition}{Определение}
+\newtheorem{lemma}[theorem]{Лемма}
+\newtheorem{note}[theorem]{Замечание}
+\newtheorem{example}[theorem]{Пример}
+\newtheorem{corollary}[theorem]{Следствие}
+
+\newcommand{\task}[3]{\par\noindent\stepcounter{task}{\bf Задача~\arabic{task}.~\printscore{#1} {#2} } {#3} \vskip 6pt}
+
+\newcommand*{\hm}[1]{#1\nobreak\discretionary{}{\hbox{$#1$}}{}}
+
+\begin{document}
+\centerline{\Large \bf Практика №7 по курсу <<Теория алгоритмов>>}
+\centerline{\Large \bf <<Комплементарные классы сложности>>}
+\centerline{Группы ФТ-301, ФТ-302}
+
+Комплементарный класс множества языков $X$ определяется как $\mathtt{co{\text -}X} = \{\bar{\mathcal{L}} \mid \mathcal{L} \in X\}$.
+
+Рассмотрим определение класса $\mathtt{NP}$ через понятие сертификатов: $\mathcal{L} \in \mathtt{NP} \Leftrightarrow$ существует машина Тьюринга $M$ такая, что для любого $x \in \mathcal{L}$ существует \textit{сертификат} $y$ полиномиального размера от длины $x$, то есть $|y| \leq p(|x|)$ такой, что $M(x, y) = \texttt{accept}$. Если же $x \notin \mathcal{L}$, то для любого полиномиального сертификата верно, что $M(x, y) = \texttt{reject}$.
+
+В рамках такого определения комплементарным классом $\mathtt{co{\text -}NP}$ будет являться множество языков $\mathcal{L}$ таких, что существует машина Тьюринга $M$ такая, что  для любого $x \notin \mathcal{L}$ существует сертификат $y$ полиномиальной длины такой, что $M(x, y) = \texttt{accept}$. Если же $x \in \mathcal{L}$, то для всех полиномиальных сертификатов $M(x, y) = \texttt{reject}$.
+
+\section{Упражнение. $\mathtt{P} = \mathtt{co{\text -}P}$}
+
+Докажем, что классы $\mathtt{P}$ и $\mathtt{co{\text -}P}$ совпадают. Для этого возмьём произвольный язык $\mathcal{L} \in \mathtt{P}$. Для данного языка существует детерминированная машина Тьюринга $M$, распознающая его за полиномиальное время. Построим машину Тьюринга $M'$, в которой просто поменяем местами состояния $q_{accept}$ и $q_{reject}$. Несложно заметить, что $M'$ распознает язык $\bar{\mathcal{L}}$, а значит $\bar{\mathcal{L}} \in \mathtt{P}$. Отсюда следует, что $\mathtt{co{\text -}P} \subset \mathtt{P}$. Аналогичным образом можно доказать обратное включение, откуда получаем, что $\mathtt{P} = \mathtt{co{\text -}P}$.
+
+\subsection{$\mathtt{NP}$ и $\mathtt{co{\text -}NP}$}
+Как соотносятся между собой классы $\mathtt{NP}$ и $\mathtt{co{\text -}NP}$? Можно ли с ними провернуть такой же трюк для доказательства равенства, а если нет - то в чём будет проблема?
+
+Для начала вспомним структуру недетерминированной машины Тьюринга, после чего рассмотрим определение класса $\mathtt{NP}$ через НМТ:
+\begin{itemize}
+\item Недетерминированная машина Тьюринга также задается шестёркой $\langle \Gamma, Q, \delta, q_{start}, q_{accept}, q_{reject} \rangle$, где самое главное отличие состоит в том, что $\delta$ является многозначным отображением ($\delta \subset (\Gamma \times Q) \times (\Gamma \times Q \times \{\leftarrow, \uparrow, \rightarrow\}$)
+\item В отличие от детерминированной машины Тьюринга, НМТ имеет несколько путей вычисления, которые в совокупности образуют дерево вычислений
+\item НМТ принимает вход только в том случае, если существует \textbf{хотя бы один} путь вычисления, заканчивающийся в состоянии $q_{accept}$ 
+\item Время работы НМТ вычисляется как длина самого глубокого пути вычисления
+\end{itemize}
+
+Тогда класс $\mathtt{NP}$ через НМТ определяется следующим образом: $\mathcal{L} \in \mathtt{NP} \Leftrightarrow $ существует \textbf{недетерминированная} машина Тьюринга, распознающая язык $\mathcal{L}$ за полиномиальное время.
+
+Проблема при попытке адаптировать НМТ для языка $\mathcal{L}$ к распознаванию языка $\bar{\mathcal{L}}$ возникает из-за того, что простая смена состояний $q_{accept}$ и $q_{reject}$ не приводит к какому-либо предсказемому результату, потому что если среди всех веток вычислений для слова $x$ присутствовала хотя бы одна ветка, заначивающаяся состоянием $q_{reject}$, то после смены состояний новая НМТ будет всё ещё распознавать слово $x$ исходного языка. 
+
+Вопрос о соотношении классов $\mathtt{NP}$ и $\mathtt{co{\text -}NP}$ до сих пор остается открытым.
+
+\subsection{Упражнение}
+
+Решим следующую задачу: докажите, что если $\mathtt{NP} \ne \mathtt{co{\text -}NP}$, то $\mathtt{NP} \ne \mathtt{P}$.
+
+Проведём доказательство от противного~--- пусть $\mathtt{NP} \ne \mathtt{co{\text -}NP}$ и $\mathtt{NP} = \mathtt{P}$. Но мы знаем, что $\mathtt{P} = \mathtt{co{\text -}P}$, а значит $\mathtt{NP} = \mathtt{co{\text -}NP}$~--- противоречие.
+
+\section{Задачи связанные с проверкой на простоту}
+
+Рассмотрим пару задач, связанных с проверкой числа на простоту:
+\begin{itemize}
+\item $\mathtt{IsPrime}(x)$~--- является ли число $x$ простым
+\item $\mathtt{IsComposite}(x)$~--- является ли число $x$ составным
+\end{itemize}
+
+Будем считать, что исходное число $x$ записано на ленте в двоичном виде, так как в противном случае задача представляется достаточно тривиальной~--- если $x$ записано в унарной системе счисления, то можно за $O(x)$ проверить число на простоту, однако если же $x$ записано на ленте в системе счисления с основанием больше 1, то длина входа в таком случае равна $O(\log x)$ и тривиальные алгоритмы будут работать за экспоненциалное время относительно длины входа $O(x) = O(2^n), \text{ где } n = \log x$.
+
+Легко доказать, что $\mathtt{IsComposite} \in \mathtt{NP}$, а $\mathtt{IsPrime} \in \mathtt{co{\text -}NP}$, так как для первой задачи существует сертификат $x = a \cdot b, a > 1, b > 1$ разложения на множители, а язык $\mathtt{IsPrime}$ является комплементарным к языку $\mathtt{IsComposite}$.
+
+Более сложной задачей является доказательство соотношения $\mathtt{IsPrime} \in \mathtt{NP}$. Для этого нужно придумать достаточно компактный сертификат простоты числа $x$ (см. \url{http://bit.ly/prime-cert}).
+
+Ещё более важный результат был получен относительно недавно~--- в 2008 году было доказано, что $\mathtt{IsPrime} \in \mathtt{P}$, а значит и $\mathtt{IsComposite} \in \mathtt{P}$.
+
+Рассмотрим теперь задачу распознавания $\mathtt{HasBigFactor}(n, d)$~--- имеет ли число $n$ в своём разложении простой множитель $p > d$? Несложно заметить, что $\mathtt{HasBigFactor} \in \mathtt{NP}$, так как существует сертификат принадлежности числа языку - достаточно предъявить разложение $n = a \cdot p$, где $p$~--- простое и $p > d$. \textbf{Важно} понимать, что либо сертифицирующий алгоритм должен проверять $p$ на простоту, либо мы должны предоставить полиномиальный сертификат простоты числа $p$ (оба варианты будут правильными с учётом результата 2008 года). Также ясно, что $\mathtt{HasBigFactor} \in \mathtt{co{\text -}NP}$, так как в качестве отрицательного сертификата достаточно предоставить полное разложение числа на простые множители (и опять же сертифицировать каждый множитель либо проверять множители на простоту в рамках алгоритма МТ). 
+
+Таким образом $\mathtt{HasBigFactor} \in \mathtt{NP} \cap \mathtt{co{\text -}NP}$. Данный пример интересен тем, что неизвестно, принадлежит ли данная задача классу $\mathtt{P}$ (ясно, что $\mathtt{P} \subset \mathtt{NP} \cap \mathtt{co{\text -}NP}$).
+\end{document}
