@@ -1,0 +1,150 @@
+\documentclass[
+    11pt,
+    a4paper
+]{article}
+\usepackage[
+    a4paper,
+    left = 10mm,
+    right = 10mm,
+    top = 5mm,
+    bottom = 5mm,
+    bindingoffset = 0cm,
+    columnsep = 1cm
+]{geometry}
+
+\usepackage{hyperref}
+\usepackage{xparse}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage{tkz-graph}
+\usepackage[russian]{babel}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{adjustbox}
+\usetikzlibrary{arrows,%
+                shapes,positioning}
+                
+%\usepackage{nopageno,comment}
+\usepackage{indentfirst}
+\usepackage{cmap}
+\usepackage{ifthen}
+\usepackage{tikz}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage{listings}% http://ctan.org/pkg/listings
+\lstset{
+  basicstyle=\ttfamily,
+  mathescape
+}
+
+\newcommand*\justify{%
+  \fontdimen2\font=0.4em% interword space
+  \fontdimen3\font=0.2em% interword stretch
+  \fontdimen4\font=0.1em% interword shrink
+  \fontdimen7\font=0.1em% extra space
+  \hyphenchar\font=`\-% allowing hyphenation
+}
+
+\ExplSyntaxOn
+\DeclareExpandableDocumentCommand{\eval}{m}{\fp_eval:n {#1}}
+\ExplSyntaxOff
+
+\newcommand{\Sum}{\displaystyle\sum\limits}
+\newcommand{\Max}{\max\limits}
+\newcommand{\Min}{\min\limits}
+\newcommand{\fromto}[3]{{#1}=\overline{{#2},\,{#3}}}
+\newcommand{\floor}[1]{\left\lfloor{#1}\right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil{#1}\right\rceil}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\tild}{\widetilde}
+
+\newcommand{\undef}{\otimes}
+\newcommand{\emptys}{\varepsilon}
+\newcommand{\serial}{\texttt{serial}}
+\newcommand{\diff}{\texttt{diff}}
+\newcommand{\sync}{\texttt{sync}}
+\newcommand{\nsync}{\texttt{near\_sync}}
+\newcommand{\remove}{\texttt{remove}}
+\newcommand{\lcp}{\texttt{lcp}}
+\newcommand{\lce}{\texttt{LCE}}
+\newcommand{\lcpinf}{\texttt{lcp}_{\infty}}
+\newcommand{\start}{\texttt{start}}
+\newcommand{\finish}{\texttt{end}}
+\newcommand{\id}{\texttt{id}}
+\newcommand{\slp}{\texttt{SLP}}
+\newcommand{\rlslp}{\texttt{RLSLP}}
+\newcommand{\rlslpq}{\texttt{RLSLP}_q}
+
+\newcommand{\g}{g}
+\newcommand{\grl}{g_{rl}}
+\newcommand{\grlq}{g_{rlq}}
+\newcommand{\zno}{z_{no}}
+\newcommand\growth{{1.1}}
+
+\newcommand{\popcnt}{\texttt{popcnt}}
+\newcommand{\val}{\texttt{val}}
+\newcommand{\lz}{\texttt{LZ}}
+\newcommand{\pr}[2]{#1 \rightarrow #2}
+\newcommand{\tspan}{\texttt{span}}
+\newcommand{\parent}{\texttt{parent}}
+\newcommand{\bin}{\texttt{bin}}
+\newcommand{\hint}{\texttt{hint}}
+\newcommand{\recompression}{\texttt{recomp}}
+\newcommand{\pending}{\texttt{pending}}
+
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\renewcommand{\hat}{\widehat}
+\renewcommand{\emptyset}{\varnothing}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\ol}{\overline}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Теорема}
+\newtheorem{definition}{Определение}
+\newtheorem{lemma}[theorem]{Лемма}
+\newtheorem{note}[theorem]{Замечание}
+\newtheorem{example}[theorem]{Пример}
+\newtheorem{corollary}[theorem]{Следствие}
+
+\newcommand{\task}[3]{\par\noindent\stepcounter{task}{\bf Задача~\arabic{task}.~\printscore{#1} {#2} } {#3} \vskip 6pt}
+
+\newcommand*{\hm}[1]{#1\nobreak\discretionary{}{\hbox{$#1$}}{}}
+
+\begin{document}
+\centerline{\Large \bf Практика №6 по курсу <<Теория алгоритмов>>}
+\centerline{\Large \bf <<Иерархия классов сложности>>}
+\centerline{Группы ФТ-301, ФТ-302}
+
+\section{Иерархия временных классов сложности}
+
+На теории была доказана теорема об иерархии временных классов сложности:
+$$\texttt{DTIME}(f(n)) \subsetneq \texttt{DTIME}(f(2n + 1)^3)$$
+
+Отсюда следует, что $\cup_{c \geq 1}^k \texttt{DTIME}(n^c) \subsetneq P$ для любого $k$.
+
+На самом деле можно доказать, что $\texttt{DTIME}(f(n)) \subsetneq \texttt{DTIME}(g(n))$, если $g(n) = \omega(f(n) \log f(n))$, однако данное доказательство требует более хитрых приёмов ускорения машин Тьюринга.
+
+\subsection{Упражнение. <<Правильные>> функции}
+
+Попробуем с помощью результата теоремы об иерархии времени ответить на следующий вопрос: существует ли вычислимая <<неправильная>> функция? (то есть функция, для которой $f(n)$ нельзя вычислить на машине Тьюринга за время $O(n + f(n))$).
+
+Для ответа на этот вопрос попробуем построить функцию $I(n): \mathcal{N} \mapsto \{0, 1\}$. Для этого зафиксируем некоторый язык $\mathcal{L}$ над бинарным алфавитом. Также занумеруем все биарные строки натуральными числами так, чтобы для любой строки $x$ длины $\ell$ её номер $\texttt{enc}(x)$ не превосходил значения $2^{\ell + 1}$~--- для этого достаточно рассмотреть числа $1x$ в двоичной системе счисления. Тогда несложно показать, что перевод бинарной строки $x$ длины $\ell$ в соответствующую унарную строку $1^{\texttt{enc}(x)}$, а также обратную трансформацию можно произвести с помощью машины Тьюринга, работающей за время $O(\ell2^\ell) = O(\texttt{enc}(x) \log \texttt{enc}(x))$. Тогда построим функцию $I$ следующим образом: $I(n) = [\texttt{dec}(n) \in \mathcal{L}]$. Если для языка $\mathcal{L}$ существует машина Тьюринга, разрешающая его за время $T(\ell)$, то функция $I(n)$ вычисляется за время $O(T(\log n) + n \log n)$. Чтобы время на вычисление принадлежности слова языку доминировало над временем конвертации числа в двоичное представление выберем $\mathcal{L}$ из разности множеств $\texttt{DTIME}(2^{(2\ell + 1)^6}) \setminus \texttt{DTIME}(2^{\ell^2})$. Заметим, что для такого языка время вычисления функции $I(n)$ ограничено снизу величиной $\Omega(n^2)$, так как если существует машина Тьюринга, вычисляющая данную функцию за время $f(n) = O(n^2)$, то исходный язык $\mathcal{L}$ можно также разрешить за время $O(n^2) = O(2^{\ell^2})$, а значит $\mathcal{L} \in \texttt{DTIME}(2^{\ell^2})$. Таким образом $I(n)$~--- вычислимая функция, которая не является <<правильной>>.
+
+\section{Иерархия классов}
+
+На лекциях были рассмотрены следующие соотношения между разными классами сложности:
+
+$$\texttt{DTIME}(f(n)) \subset_1 \texttt{NTIME}(f(n)) \subset_2 \texttt{SPACE}(f(n)) \subset_3 \texttt{NSPACE}(f(n)) \subset_4 \texttt{TIME}(k^{f(n) + \log n})$$
+
+Нетривиальным отношениями в этой цепочке являются вложения между разными классами, то есть $\texttt{NTIME}(f(n)) \subset_2 \texttt{SPACE}(f(n))$ и $\texttt{NSPACE}(f(n)) \subset_4 \texttt{TIME}(k^{f(n) + \log n})$.
+\begin{itemize}
+\item[$\subset_2$] Для доказательства данного включения достаточно просимулировать работу недетерминированной машины Тьюринга, использую $O(f(n))$ ячеек памяти. Так как время работы машины Тьюиринга ограничено функцией $f(n)$, то каждая ветка исполнения имеет глубину не более чем $f(n)$, а значит можно явно сохранить все решения вдоль данного пути в дереве вычислений машины Тьюринга, используя $O(f(n))$ ячеек памяти
+\item[$\subset_4$] Для доказательства данного включения необходимо рассмотреть граф всевозможных конфигураций машины Тьюринга. Так как память МТ ограничена значением $f(n)$, то количество возможных конфигураций не превосходит величины $O(k^{f(n)} \cdot n) = O(k^{f(n) + \log n})$ для некоторой константы $k$, где множитель $n$ появляться из-за присутствия в конфигурации указателя не исходную ленту, которая имеет $n$ непустых ячеек. В данном графе нужно проверить достижимость одной из терминальных вершин из вершины, соответствующей начальной конфигурации МТ. Данную задачу можно решить за полиномиальное время от размера графа, то есть за время $O((k^{f(n) + \log n})^c) = O((k^c)^{f(n) + \log n}) = O(k'^{f(n) + \log n})$.
+\end{itemize}
+
+\end{document}
